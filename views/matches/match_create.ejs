@@ -1,0 +1,328 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('../partials/title-meta', {"title":"Create New"}) %>
+<!-- bootstrap-datepicker css -->
+<link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+<!-- Plugins css -->
+<link href="assets/libs/dropzone/dropzone.css" rel="stylesheet" type="text/css" />
+<%- contentFor('body') %>
+<%- include ('../partials/page-title', {"pagetitle": "Match" , "title" : "Create New" }) %>
+<form id="creatematch-form" autocomplete="off" class="needs-validation" novalidate>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <input type="hidden" class="form-control" id="formAction" name="formAction" value="add">
+          <input type="hidden" class="form-control" id="match-id-input">
+
+          <div class="alert alert-success text-center mb-4 flash hidden" style="display:none;" role="alert">                   
+          </div>                   
+          <div class="alert alert-danger text-center mb-4 flash hidden" style="display:none;" role="alert">
+         
+          </div>
+
+          <div class="mb-3">
+            <label for="match-played-input" class="form-label">Played Against</label>
+            <select id="match-played-input" name="match-played-input" type="text" class="form-select" required>
+              
+            </select>
+
+            <div class="invalid-feedback">Please enter a name for the Match.</div>
+          </div>
+
+
+          <div class="mb-3">
+            <label for="match-type-input" class="form-label">Match Type</label>
+            <select id="match-type-input" name="match-type-input" type="text" class="form-control" >
+                <option value="1">Training</option>
+                <option value="2">Match</option>
+            </select>            
+          </div>
+
+          <div class="mb-3">
+              <label for="match-date-input" class="form-label">Date</label>                        
+              <input type="text" id="match-date-input" class="form-control" placeholder="Select due date" name="match-date-input" data-date-format="yyyy-mm-dd" data-provide="datepicker" data-date-autoclose="true" required />
+              <div class="invalid-feedback">Please select Transaction Date.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="match-status-input1">Top Performer</label>
+            <select class="form-select" id="match-player-input1">                  
+            </select>
+            <div class="invalid-feedback">Please select player.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="replay-input" class="form-label">Replay Link</label>                        
+            <input placeholder="https://" id="replay-input" name="replay-input" type="text" class="form-control" required >                                                    
+          </div>
+
+          <div class="mb-3">
+            <label for="match-location-input" class="form-label">Location</label>                        
+            <input  id="match-location-input" name="match-location-input" type="text" class="form-control" required >                                                    
+          </div>
+
+          <div class="mb-3">
+            <label for="match-result-input" class="form-label">Result</label>                        
+            <select  id="match-result-input" name="match-result-input" class="form-select" required >                                                    
+              <option value="WON">WON</option>
+              <option value="WON">LOST</option>
+            </select>
+          </div>
+
+          <!-- <div class="mb-3">
+            <label class="form-label">Match Image</label>
+            <div class="text-center">
+              <div class="position-relative d-inline-block">
+                <div class="position-absolute bottom-0 end-0">
+                  <label for="match-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Select Image">
+                    <div class="avatar-xs">
+                      <div class="avatar-title bg-light border rounded-circle text-muted cursor-pointer shadow font-size-16">
+                        <i class='bx bxs-image-alt'></i>
+                      </div>
+                    </div>
+                  </label>
+                  <input class="form-control d-none" value="" id="match-image-input" type="file" accept="image/png, image/gif, image/jpeg">
+                </div>
+                <div class="avatar-lg">
+                  <div class="avatar-title bg-light rounded-circle">
+                    <img src="" id="matchlogo-img" class="avatar-md h-auto rounded-circle" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>       -->
+        </div>
+        <!-- end card body -->
+      </div>
+      <!-- end card -->
+
+    </div>
+    <!-- end col -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Player Stats</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="match-status-input">Player</label>
+                <select class="form-select" id="match-player-input">                  
+                </select>
+                <div class="invalid-feedback">Please select player.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="match-status-input">Kills</label>
+                <input type="number" class="form-control" id="match-kills-input">  
+                <div class="invalid-feedback">Please select player.</div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="match-status-input">Deaths</label>
+                <input type="number" class="form-control" id="match-deaths-input">                  
+                
+                <div class="invalid-feedback">Please select player.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="match-status-input">Assists</label>
+                <input type="number" class="form-control" id="match-assists-input">  
+                <div class="invalid-feedback">Please select player.</div>
+              </div>
+            </div>
+           
+          </div>
+          <div>
+            <button onclick="addrow();" type="button" class="btn btn-primary btn-sm">Add <i class="fa fa-arrow-down"></i></button>
+            <table id="tableparticipants" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Player ID</th>
+                  <th>Kills</th>
+                  <th>Deaths</th>
+                  <th>Assists</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- end card body -->
+      </div>
+      <!-- end card -->
+
+      
+      <!-- end card -->
+    </div>
+    <!-- end col -->
+
+    <div class="col-lg-12">
+      <div class="text-end mb-4">
+        <button type="button" onclick="create_match();" class="btn btn-primary">Create match</button>
+      </div>
+    </div>
+  </div>
+  <!-- end row -->
+</form>
+<%- contentFor('FooterJs') %>
+<!-- bootstrap datepicker -->
+<script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+<!-- Plugins js -->
+<script src="assets/libs/dropzone/dropzone-min.js"></script>
+
+<!-- <script src="assets/js/pages/project-create.init.js"></script> -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {        
+        get_players();
+        get_teams();
+    });
+
+    function get_teams(){
+      $.ajax({
+          type: "GET",            
+          url: '/teams_list',                          
+          dataType: 'json',
+          success: function(response) {    
+
+            console.log(response);
+            var teams = response.items;
+
+            var mhtml="";
+
+            for(x=0; x < teams.length; x++){
+                mhtml ="<option value ='"+ teams[x][0] +"'>"+ teams[x][1] +"</option>";
+                $("#match-played-input").append(mhtml);
+                
+            }
+                
+          }
+        });
+    }
+
+    function get_players(){        
+      $.ajax({
+          type: "GET",            
+          url: '/player_list',                          
+          dataType: 'json',
+          success: function(response) {    
+
+            console.log(response);
+            var players = response.items;
+
+            var mhtml="";
+
+            for(x=0; x < players.length; x++){
+                mhtml ="<option value ='"+ players[x][0] +"'>"+ players[x][1] +"</option>";
+                $("#match-player-input").append(mhtml);
+                $("#match-player-input1").append(mhtml);
+            }
+                
+          }
+        });
+    }
+
+    function addrow(){
+
+      var playerid= $("#match-player-input option:selected").val();
+      var gamertag= $("#match-player-input option:selected").text();
+      var kills= $("#match-kills-input").val();
+      var deaths= $("#match-deaths-input").val();
+      var assists= $("#match-assists-input").val();
+      var score = 0;
+
+      score = parseInt(kills) * 100 +parseInt(assists) * 50;
+      
+      var mhtml = "<tr><td id='"+playerid+"'>"+gamertag+"</td>";
+      mhtml += "<td>"+kills+"</td>";
+      mhtml += "<td>"+deaths+"</td>";
+      mhtml += "<td>"+assists+"</td>";
+      mhtml += "<td>"+score+"</td></tr>";
+
+      nextchild = parseInt(playerid)+1;
+      //$("#match-player-input option:eq("+nextchild+")").prop('selected',true);
+      $('#match-player-input option:selected').next().attr('selected','selected');
+      //console.log(mhtml);
+      $("#tableparticipants tbody").append(mhtml);
+    }
+
+    function _storeOTblValues(){
+        var TableData = new Array();
+        var rowCount=0;
+        $('#tableparticipants tr').each(function(row, tr) {
+            TableData[row] = {
+                "player_id": $(tr).find('td:eq(0)').attr('id')
+                , "kills": $(tr).find('td:eq(1)').text()
+                , "deaths": $(tr).find('td:eq(2)').text()
+                , "assists": $(tr).find('td:eq(3)').text()
+                , "score": $(tr).find('td:eq(4)').text()
+                
+            }
+            rowCount++;
+        });
+        TableData.shift();  // first row will be empty - so remove
+
+        return TableData;
+    }
+
+    function create_match(){
+      var played_against = $("#match-played-input").val();
+      var match_type_id = $("#match-type-input option:selected").val();
+      var match_date = $("#match-date-input").val();
+      var reply_link = $("#replay-input").val();
+      var top_performer = $("#match-player-input1").val();
+
+      var participants = _storeOTblValues();
+
+      $.ajax({
+          type: "POST",            
+          url: '/add_match',  
+          data: { 
+            'played_against': $("#match-played-input option:selected").text(),  
+            'match_type_id' : $("#match-type-input option:selected").val(),
+            'match_date' : $("#match-date-input").val(),
+            'reply_link' : $("#replay-input").val(),
+            'top_performer' : $("#match-player-input1").val(),
+            'match_location' : $("#match-location-input").val(),
+            'match_result' : $("#match-result-input1").val(),
+            'participants' : participants
+
+          },                        
+          dataType: 'json',
+          success: function(response) {  
+            console.log(response);  
+            res_type=response.type;
+            if(res_type=="error"){
+              $(".alert-danger").html(response.msg);
+              $(".alert-success").show();
+            }else{
+              $(".alert-success").html(response.msg);
+              $(".alert-success").show();
+              var url=window.location.href;
+              var path=window.location.pathname;
+              //console.log(path);
+              if(path.length > 1){
+              var newpath = url.replace(path,'/')+'matches';
+              }else{
+              var newpath = url+'matches';
+              }
+              
+              window.location.assign(newpath);  
+
+            }
+          }
+        });
+    }
+
+</script>

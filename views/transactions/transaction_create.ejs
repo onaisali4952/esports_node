@@ -1,0 +1,115 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('../partials/title-meta', {"title":"Create New"}) %>
+<!-- bootstrap-datepicker css -->
+<link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+<!-- Plugins css -->
+<link href="assets/libs/dropzone/dropzone.css" rel="stylesheet" type="text/css" />
+<%- contentFor('body') %>
+<%- include ('../partials/page-title', {"pagetitle": "transaction" , "title" : "Create New" }) %>
+<form id="createtransaction-form" autocomplete="off" class="needs-validation" novalidate>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <input type="hidden" class="form-control" id="formAction" name="formAction" value="add">
+                    <input type="hidden" class="form-control" id="voucher-id-input">
+                    <div class="mb-3">
+                        <label for="accounthead-input" class="form-label">Account Head</label>
+                        <select id="accounthead-input" name="accounthead-input" type="text" class="form-control"  required>
+                            <option></option>
+                        </select>
+                        <div class="invalid-feedback">Please select Account Head.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sponsor-input" class="form-label">Sponsor (Optional)</label>
+                        <select id="sponsor-input" name="sponsor-input" type="text" class="form-control" >
+                            <option></option>
+                        </select>
+                        <div class="invalid-feedback">Please select Sponsor.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employee-input" class="form-label">Employee (Optional)</label>
+                        <select id="employee-input" name="employee-input" type="text" class="form-control" >
+                            <option></option>
+                        </select>
+                        <div class="invalid-feedback">Please select Employee.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</form>
+
+<%- contentFor('FooterJs') %>
+<!-- bootstrap datepicker -->
+<script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {        
+        get_accountheads();
+        get_sponsers();
+        get_employees();
+    });
+
+    function get_accountheads(){        
+        $.ajax({
+            type: "GET",            
+            url: '/accountheads_list',                          
+            dataType: 'json',
+            success: function(response) {    
+                console.log(response);
+                var items=response.items;
+                var mhtml='';
+                for(x=0; x < items.length; x++){
+                    mhtml ="<option value ='"+ items[x][0] +"'>"+ items[x][1] +"</option>";
+                    $("#accounthead-input").append(mhtml);
+                }
+                
+            }
+        });
+    }
+
+    function get_sponsers(){        
+        $.ajax({
+            type: "GET",            
+            url: '/sponsors_list',                          
+            dataType: 'json',
+            success: function(response) {    
+                console.log(response);
+                var items=response.items;
+                var mhtml='';
+                for(x=0; x < items.length; x++){
+                    mhtml ="<option value ='"+ items[x][0] +"'>"+ items[x][1] +"</option>";
+                    $("#sponsor-input").append(mhtml);
+                }
+                
+            }
+        });
+    }
+
+    function get_employees(){        
+        $.ajax({
+            type: "GET",            
+            url: '/employees_list',                          
+            dataType: 'json',
+            success: function(response) {    
+                console.log(response);
+                var items=response.items;
+                var mhtml='';
+                for(x=0; x < items.length; x++){
+                    mhtml ="<option value ='"+ items[x][0] +"'>"+ items[x][1] +"</option>";
+                    $("#employee-input").append(mhtml);
+                }
+                
+            }
+        });
+    }
+
+</script>
+

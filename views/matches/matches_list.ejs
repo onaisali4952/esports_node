@@ -1,0 +1,312 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('../partials/title-meta',{"title": "Matches List" })%>
+<!-- DataTables -->
+<link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<style>
+  .active>.page-link, .page-link.active{
+    background-color: #cf0038 !important;
+  }
+</style>
+<%- contentFor('body') %>
+
+<!-- start page title -->
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-flex align-items-center justify-content-between">
+      <h4 class="mb-0 font-size-18">Matches</h4>
+
+      <div class="page-title-right">
+        <ol class="breadcrumb m-0">
+          <li class="breadcrumb-item"><a href="javascript: void(0);">Matches</a></li>
+          <li class="breadcrumb-item active">Matches List</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-2">
+          <div class="col-sm">
+            <div class="search-box me-2 d-inline-block">
+              <div class="position-relative">
+                <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search...">
+                <i class="bx bx-search-alt search-icon"></i>
+              </div>
+            </div>
+          </div>
+          <!-- end col -->
+          <div class="col-sm-auto" id="crud">
+            <div class="text-sm-end">
+              <a href="match-create" style="background-color: #cf0038; color:#ffffff;" class="btn btn-rounded" id="addProject-btn"><i class="mdi mdi-plus me-1"></i> Add New Match</a>
+            </div>
+          </div>
+          <!-- end col -->
+        </div>
+        <!-- end row -->
+        <div class="">
+          <div class="table-responsive">
+            <table class="table match-list-table align-middle table-nowrap dt-responsive nowrap w-100 table-borderless" id="projectList-table">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" style="width: 60px">#</th>
+                  <th scope="col">Match Against</th>
+                  <th scope="col">Match Date</th>
+                  <th scope="col">Top Players</th>
+                  <th scope="col">Team</th>
+                  <th scope="col">Replay</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end card -->
+  </div>
+</div>
+<!-- end row -->
+<!-- Modal -->
+<div class="modal fade" id="playerStatsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-body px-4 py-5 text-center">
+        <!-- <div class="card text-center"> -->
+          <!-- <div class="card-body"> -->
+            <div class="mb-4">
+              <img class="rounded-circle avatar-lg" id="modal_player_img" src="" alt="">
+            </div>
+            <h5 class="font-size-15 mb-1">
+              <a href="javascript: void(0);" id="modal_player_gamertag" class="text-dark">
+                
+              </a>
+            </h5>
+            <p class="text-muted" id="modal_player_ranking"></p>
+    
+            <div>
+              <a href="javascript: void(0);" class="badge bg-primary font-size-11 m-1">Match Score: <span id="modal_player_score"></span> </a>
+              
+            <!-- </div> -->
+          <!-- </div> -->
+          <div class="card-footer bg-transparent border-top">
+            <div class="contact-links d-flex font-size-20">
+              <div class="flex-fill">
+                <a href="javascript: void(0);"><img src="/assets/images/small/kills.png" style="width: 32px;"></a>
+                <p id="modal_player_kills" class="text-success"></p>
+              </div>
+              <div class="flex-fill">
+                <a href="javascript: void(0);"><img src="/assets/images/small/deaths.png" style="width: 32px;"></a>
+                <p id="modal_player_deaths" class="text-danger"></p>
+              </div>
+              <div class="flex-fill">
+                <a href="javascript: void(0);"><img src="/assets/images/small/assist.png" style="width: 32px;"></a>
+                <p id="modal_player_assists" class="text-warning"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end removeItemModal -->
+
+<%- contentFor('FooterJs') %>
+<!-- Required datatable js -->
+<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<!-- Responsive examples -->
+<script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  get_matches();
+  console.log('<%=userrole%>');
+  if('<%=userrole%>' != 'Administrator'){
+      $("#crud").html('');
+  }
+
+});
+
+
+function get_matches(){
+
+  $.ajax({
+      type: "GET",            
+      url: 'http://localhost:3000/matches_list',                          
+      dataType: 'json',
+      success: function(response) {    
+
+        //console.log(response);
+        var matches = response.items;
+
+        var mhtml="";
+
+        for(x=0; x < matches.length; x++){
+          mhtml += "<tr>";
+          mhtml += "<td>";  
+          
+            mhtml+='<div class="d-none">' +
+            matches[x][0] +
+            '</div><div class="avatar-sm bg-light rounded p-2"><img src="assets/images/team_logos/'+matches[x][13] +'" alt="" class="img-fluid rounded-circle"></div>';
+
+          mhtml+='</td>';    
+
+          mhtml += '<td><div><h5 class="text-truncate font-size-14"><a href="javascript: void(0);" class="text-dark">';
+          if(matches[x][5]!=null){
+            mhtml += matches[x][5]; 
+          }else{
+            mhtml += 'Training Session'; 
+          }
+          mhtml += '</a></h5><p class="text-muted mb-0">'+ matches[x][8]+'</p></div></td>';  
+
+          mhtml += '<td>'+matches[x][14]+'</td>';  
+
+          mhtml += '<td>'+matches[x][12]+'</td>';  
+
+          //players  
+          mhtml += '<td>';
+            mhtml+='<div class="avatar-group">';
+           // $.each(matches[x][10], )  
+            $.each(matches[x][10], function(index, value){   
+              mhtml+=  '<a href="javascript: void(0);" onclick="open_stats(\''+matches[x][11][index]+'\', \''+ matches[x][0] +'\')" class="avatar-group-item" data-img="' +
+                value +
+                '"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="' +
+                matches[x][11][index] +
+                '"><img src="assets/images/users/' +
+                value +
+                '" alt="" class="rounded-circle avatar-xs" /></a>';
+            })  
+            mhtml+='</div>';    
+          mhtml += '</td>';  
+
+          mhtml += '<td>';
+            mhtml+='<a target="_blank" href="'+matches[x][4]  +'"><i style="font-size:32px;" class="bx bx-play text-danger"></i></a>';
+
+          // mhtml+='<div class="dropdown"><a href="#" class="dropdown-toggle card-drop" data-bs-toggle="dropdown" aria-expanded="false">'
+          //   +'<i class="mdi mdi-dots-horizontal font-size-18"></i></a>'
+          //   +'<ul class="dropdown-menu dropdown-menu-end">'
+          //   +'<li><a href="projects-create" class="dropdown-item edit-list" data-edit-id="' +
+          //     matches[x][0] +
+          //   '"><i class="mdi mdi-pencil font-size-16 text-success me-1"></i> Edit</a></li><li><a href="#removeItemModal" data-bs-toggle="modal" class="dropdown-item remove-list" data-remove-id="' +
+          //     matches[x][0] +
+          //   '"><i class="mdi mdi-trash-can font-size-16 text-danger me-1"></i> Replay</a></li></ul></div>';
+          mhtml += '</td>';
+          mhtml += "</tr>";  
+        }
+
+        //console.log(mhtml);
+
+        $('.match-list-table tbody').html(mhtml);
+
+        $('.match-list-table').DataTable({
+          bLengthChange: !1,
+          language: {
+            oPaginate: {
+              sNext: '<i class="mdi mdi-chevron-right"></i>',
+              sPrevious: '<i class="mdi mdi-chevron-left"></i>',
+            },
+          },
+          order: [[0, "desc"]],
+          drawCallback: function (t) {
+            tooltipElm(), projectListActions();
+          },
+        }), 
+        $("#searchTableList").keyup(function () {
+            $("#projectList-table").DataTable().search($(this).val()).draw();
+        })
+        $(".dataTables_length select").addClass("form-select form-select-sm"),
+        $(".dataTables_paginate").addClass("pagination-rounded"),
+        $(".dataTables_filter").hide();
+      }
+    });
+}
+function _toConsumableArray(t) {
+  if (Array.isArray(t)) {
+    for (var e = 0, a = Array(t.length); e < t.length; e++) a[e] = t[e];
+    return a;
+  }
+  return Array.from(t);
+}
+function tooltipElm() {
+  var t = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [].concat(_toConsumableArray(t)).map(function (t) {
+    return new bootstrap.Tooltip(t);
+  });
+}
+function projectListActions() {
+  var a;
+  Array.from(document.querySelectorAll(".edit-list")).forEach(function (e) {
+    e.addEventListener("click", function (t) {
+      (a = e.getAttribute("data-edit-id")),
+        (allProjectList = allProjectList.map(function (t) {
+          return (
+            t.id == a &&
+              sessionStorage.setItem("editInputValue", JSON.stringify(t)),
+            t
+          );
+        }));
+    });
+  }),
+    Array.from(document.querySelectorAll(".remove-list")).forEach(function (e) {
+      e.addEventListener("click", function (t) {
+        (getid = e.getAttribute("data-remove-id")),
+          document
+            .getElementById("remove-item")
+            .addEventListener("click", function () {
+              var e;
+              (e = getid),
+                (allProjectList = allProjectList.filter(function (t) {
+                  return t.id != e;
+                })),
+                $.fn.DataTable.isDataTable("#projectList-table") &&
+                  $("#projectList-table").DataTable().destroy(),
+                loadProjectList(allProjectList),
+                document.getElementById("close-removeProjectModal").click();
+            });
+      });
+    });
+
+  }
+
+
+  function open_stats(gamertag = null, matchid=null){
+
+    $.ajax({
+      type: "POST",            
+      url: 'http://localhost:3000/player_match_stat',   
+      data: {'gamertag':gamertag, 'matchid':matchid},                       
+      dataType: 'json',
+      success: function(response) {    
+        console.log(response);
+        var playerstats=response.items;
+        $("#modal_player_img").attr('src','/assets/images/users/'+playerstats[0][7]);
+        $("#modal_player_gamertag").html(playerstats[0][6]);
+        $("#modal_player_ranking").html("Current Ranking: "+playerstats[0][8]);
+        $("#modal_player_score").html(playerstats[0][5]);
+        $("#modal_player_kills").html("Kills: "+playerstats[0][2]);
+        $("#modal_player_deaths").html("Deaths: "+playerstats[0][3]);
+        $("#modal_player_assists").html("Assists: "+playerstats[0][4]);
+      }
+    });
+
+
+    $('#playerStatsModal').modal('show');
+
+  }
+
+</script>

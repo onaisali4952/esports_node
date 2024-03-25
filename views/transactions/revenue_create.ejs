@@ -1,0 +1,131 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('../partials/title-meta', {"title":"Add Revenue Transaction"}) %>
+<!-- bootstrap-datepicker css -->
+<link href="assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+<%- contentFor('body') %>
+<%- include ('../partials/page-title', {"pagetitle": "transaction"  }) %>
+<form id="createtransaction-form" autocomplete="off" class="needs-validation" novalidate>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                   
+                    <div class="alert alert-success text-center mb-4 flash hidden" style="display:none;" role="alert">                   
+                    </div>                   
+                    <div class="alert alert-danger text-center mb-4 flash hidden" style="display:none;" role="alert">                   
+                    </div>
+                   
+                    
+                    <div class="mb-3">
+                        <label for="sponsor-input" class="form-label">Sponsor</label>
+                        <select onchange="onsponsorchange();" id="sponsor-input" name="sponsor-input" type="text" class="form-control" >
+                            <option></option>
+                        </select>
+                        <div class="invalid-feedback">Please select Employee.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date-input" class="form-label">Date</label>                        
+                        <input type="text" id="date-input" class="form-control" placeholder="Select due date" name="date-input" data-date-format="yyyy-mm-dd" data-provide="datepicker" data-date-autoclose="true" required />
+                        <div class="invalid-feedback">Please select Transaction Date.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amount-input" class="form-label">Monthly Sponsorship Amount</label>                        
+                        <input value="0" id="amount-input" name="amount-input" type="text" class="form-control" required >                                                    
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="text-end mb-4">
+              <button type="button" onclick="create_voucher();" class="btn btn-primary">Add Revenue</button>
+            </div>
+          </div>
+
+    </div>
+
+
+</form>
+
+<%- contentFor('FooterJs') %>
+<!-- bootstrap datepicker -->
+<script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {        
+        get_sponsors();
+    });
+
+    function get_sponsors(){        
+        $.ajax({
+            type: "GET",            
+            url: '/sponsors_list',                          
+            dataType: 'json',
+            success: function(response) {    
+                console.log(response);
+                var items=response.items;
+                var mhtml='';
+                for(x=0; x < items.length; x++){
+                    mhtml ="<option amount='"+ items[x][2] +"' value ='"+ items[x][0] +"'>"+ items[x][1] +"</option>";
+                    $("#sponsor-input").append(mhtml);
+                }
+                
+            }
+        });
+    }
+
+    function onsponsorchange(){
+        var amount = $("#sponsor-input option:selected").attr("amount");
+        $("#amount-input").val(amount);
+        
+    }
+
+    function create_voucher(){
+
+        var sponsorid = $("#sponsor-input option:selected").val();
+        var amount = $("#amount-input").val();
+        var transaction_date = $("#date-input").val();
+        $.ajax({
+            type: "POST",     
+            data: {'sponsorid': sponsorid, 'amount': amount, 'transactiondate':transaction_date },       
+            url: '/add_revenue',                          
+            dataType: 'json',
+            success: function(response) {    
+                //console.log(response);
+                res_type=response.type;
+
+                if(res_type=='success'){
+                    $(".alert-success").html(response.msg);
+                    $(".alert-success").show();
+                    var url=window.location.href;
+                    var path=window.location.pathname;
+                    //console.log(path);
+                    if(path.length > 1){
+                    var newpath = url.replace(path,'/')+'transactions';
+                    }else{
+                    var newpath = url+'transactions';
+                    }
+                    
+                    window.location.assign(newpath);    
+                }else{
+                    $(".alert-danger").html(response.msg);
+                    $(".alert-danger").show();
+                }
+            },
+            error: function(e){
+                $(".alert-error").html(response.msg);
+                $(".alert-error").show();
+            }
+        });
+
+    }
+
+</script>
+

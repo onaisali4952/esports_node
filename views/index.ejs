@@ -1,0 +1,279 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('partials/title-meta', {"title": "Dashboard" }) %>
+<%- contentFor('body') %>
+<%- include ('partials/page-title', {"pagetitle": "Dashboards" , "title" : "Dashboard" })%>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-xl-12">
+    <div class="card overflow-hidden">
+      <div style="background-color: #cf0038;">
+        <div class="row">
+          <div class="col-7">
+            <div class="p-3 text-white">
+              <h5 style="font-size: 20px;">Welcome To </h5>
+              <h5 style="font-size: 26px;" class="text-white">The Sentinal Hub</h5>
+              <div class="col-sm-4">
+                
+                <h5 class="font-size-15 text-truncate"><%- username %></h5>
+                <p class=" mb-0 text-truncate"><%- userrole %></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-5 align-self-end">
+            <img src="/assets/images/gaming-img.png" alt="" class="img-fluid">
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-0">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="avatar-md profile-user-wid mb-4">
+              <img src="/assets/images/team_logos/SEN_logo.jpg" alt="" class="img-thumbnail rounded-circle">
+            </div>
+            <h3 class="mt-5">Events:</h3>
+            <div id="calendar">
+
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>   
+  </div>
+  <div class="col-xs-12 col-sm-12 col-xl-12">
+    <div class="row">
+      <div class="col-xl-12">
+        <h3>The Team:</h3>
+          <div class="row" id="player-cards-row">
+            <!-- dynamic player card -->
+            
+            <!-- dynamic card end -->
+          </div>
+          
+      </div>
+    </div>
+    <!-- end row -->
+  </div>
+</div>
+<!-- end row -->
+
+
+</div>
+<!-- container-fluid -->
+</div>
+<!-- End Page-content -->
+
+<!-- Transaction Modal -->
+<div class="modal fade transaction-detailModal" tabindex="-1" role="dialog" aria-labelledby="transaction-detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="transaction-detailModalLabel">Order Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">Product id: <span class="text-primary">#SK2540</span></p>
+        <p class="mb-4">Billing Name: <span class="text-primary">Neal Matthews</span></p>
+
+        <div class="table-responsive">
+          <table class="table align-middle table-nowrap">
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">
+                  <div>
+                    <img src="/assets/images/product/img-7.png" alt="" class="avatar-sm">
+                  </div>
+                </th>
+                <td>
+                  <div>
+                    <h5 class="text-truncate font-size-14">Wireless Headphone
+                      (Black)</h5>
+                    <p class="text-muted mb-0">$ 225 x 1</p>
+                  </div>
+                </td>
+                <td>$ 255</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <div>
+                    <img src="/assets/images/product/img-4.png" alt="" class="avatar-sm">
+                  </div>
+                </th>
+                <td>
+                  <div>
+                    <h5 class="text-truncate font-size-14">Phone patterned cases
+                    </h5>
+                    <p class="text-muted mb-0">$ 145 x 1</p>
+                  </div>
+                </td>
+                <td>$ 145</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <h6 class="m-0 text-right">Sub Total:</h6>
+                </td>
+                <td>
+                  $ 400
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <h6 class="m-0 text-right">Shipping:</h6>
+                </td>
+                <td>
+                  Free
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <h6 class="m-0 text-right">Total:</h6>
+                </td>
+                <td>
+                  $ 400
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end modal -->
+
+
+<%- contentFor('FooterJs') %>
+<!-- apexcharts -->
+<script src="/assets/libs/apexcharts/apexcharts.min.js"></script>
+
+<!-- dashboard init -->
+<script src="/assets/js/pages/dashboard.init.js"></script>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          allDaySlot: true,
+          eventDisplay: 'block',
+          events: function(info, successCallback, failureCallback) {
+            console.log('going to get events');
+            var s = info.startStr.valueOf();
+            var e = info.endStr.valueOf();
+            start = moment(s).format('YYYY-MM-DDTHH:mm:ss');
+            end = moment(e).format('YYYY-MM-DDTHH:mm:ss');           
+                  
+            $.ajax({
+              type: "GET",            
+              url: '/matches_schedule/'+start+'/'+end,                          
+              dataType: 'json',
+              success: function(response) {              
+                console.log(response);
+                var res_type = response.type;
+                var mdata = response.data;                 
+                var msg = response.msg;
+
+                console.log(mdata);            
+
+                if(res_type == 'error'){                  
+                  
+                }               
+                else if(res_type == 'success'){                                  
+                  successCallback(mdata);
+                }
+              },
+              error: function(e){
+               
+                console.log(e);
+                
+              }
+            });
+          },
+          eventMouseEnter: function(info) {
+            //tooltip
+            var event = info.event;            
+            $(info.el).attr("data-toggle","tooltip");
+            $(info.el).tooltip({
+              title: event.title,
+              html: true, 
+              placement: 'bottom',
+              trigger: 'hover',
+              container: 'body'});
+          },
+          eventClick: function(info){
+            var url=window.location.href;
+            var path=window.location.pathname;
+            //console.log(path);
+            if(path.length > 1){
+              var newpath = url.replace(path,'/')+'matches';
+            }else{
+              var newpath = url+'matches';
+            }
+            
+            window.location.assign(newpath);            
+
+          },
+        });
+        calendar.render();
+
+        get_players();
+
+      });
+
+
+      function get_players(){
+
+        $.ajax({
+          type: "GET",            
+          url: 'http://localhost:3000/player_list',                          
+          dataType: 'json',
+          success: function(response) {    
+
+            console.log(response);
+            var players = response.items;
+
+            var mhtml="";
+
+            for(x=0; x < players.length; x++){
+              
+
+              mhtml+='<div class="col-xl-3">';
+              mhtml+='<div class="card">';
+              mhtml+='<img class="card-img-top img-fluid" src="/assets/images/users/' + players[x][6] + '" alt="Card image cap">';
+              mhtml+='<div class="card-body">';
+              mhtml+='<h4 class="card-title">'+ players[x][1] +'</h4>';
+              mhtml+='<p class="card-text"></p>';
+              mhtml+='</div>';
+              mhtml+='<ul class="list-group list-group-flush">';
+              mhtml+='<li class="list-group-item">RANKING:</li>';
+              mhtml+='<li class="list-group-item">'+ players[x][2]+'</li>';
+              mhtml+='</ul>';
+              mhtml+='<div class="card-body">';
+                mhtml+='<a href="javascript: void(0);" class="card-link">Card link</a>';
+                mhtml+='<a href="javascript: void(0);" class="card-link">Another link</a>';
+                mhtml+='</div></div></div>';
+            }
+
+            $("#player-cards-row").html(mhtml);
+
+          }
+        })
+
+
+      }
+
+</script>
+
+</body>

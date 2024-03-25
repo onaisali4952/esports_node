@@ -1,0 +1,209 @@
+<%- contentFor('HeaderCss') %>
+<%- include ('../partials/title-meta',{"title": "Matches List" })%>
+<!-- DataTables -->
+<link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+<style>
+  .active>.page-link, .page-link.active{
+    background-color: #cf0038 !important;
+  }
+</style>
+<%- contentFor('body') %>
+
+<!-- start page title -->
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-flex align-items-center justify-content-between">
+      <h4 class="mb-0 font-size-18">Transactions</h4>
+
+      <div class="page-title-right">
+        <ol class="breadcrumb m-0">
+          <li class="breadcrumb-item"><a href="javascript: void(0);">Transactions</a></li>
+          <li class="breadcrumb-item active">Transaction List</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+
+        <div class="row mb-2">
+            <div class="col-sm">
+              <div class="search-box me-2 d-inline-block">
+                <div class="position-relative">
+                  <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search...">
+                  <i class="bx bx-search-alt search-icon"></i>
+                </div>
+              </div>
+            </div>
+            <!-- end col -->
+
+            <div class="col-sm-auto" id="cruds">
+              <div class="text-sm-end">
+                <a href="salary-create" style="background-color: #cf0038; border-color: #cf0038; color:#ffffff;" class="btn btn-rounded btn-secondary" id="addProject-btn"><i class="mdi mdi-plus me-1"></i> Salary</a>
+                <a href="revenue-create" class="btn btn-rounded btn-primary" id="addProject-btn"><i class="mdi mdi-plus me-1"></i> Revenue</a>
+                
+              </div>
+            </div>
+            <!-- end col -->
+          </div>
+          <!-- end row -->
+          <div class="">
+            <div class="table-responsive">
+              <table class="table voucher-list-table align-middle table-nowrap dt-responsive nowrap w-100 table-borderless" id="projectList-table">
+                <thead class="table-light">
+                  <tr>
+                    
+                    <th scope="col">ID</th>
+                    <th scope="col">Account Head</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Sponser</th>
+                    <th scope="col">Employee</th>
+                    <th scope="col" style='text-align:right;'>Debit</th>
+                    <th scope="col" style='text-align:right;'>Credit</th>
+                    <th scope="col" style='text-align:right;'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+  
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- contentFor('FooterJs') %>
+<!-- Required datatable js -->
+<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<!-- Responsive examples -->
+<script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        get_transactions();
+        if('<%=userrole%>' != 'Administrator'){
+            $("#cruds").html('');
+        }
+
+    });
+
+    function get_transactions(){
+        $.ajax({
+            type: "GET",            
+            url: '/transaction_list',                          
+            dataType: 'json',
+            success: function(response) {    
+
+                console.log(response);
+                var transactions = response.items;
+
+                var mhtml="";
+                var balance = 0;
+                for(x=0; x < transactions.length; x++){
+                    mhtml += "<tr>";
+                    mhtml += "<td>"+transactions[x][0] +"</td>";
+                    mhtml += "<td>"+transactions[x][1] +"</td>";
+                    mhtml += "<td>"+transactions[x][6] +"</td>";
+                    mhtml += "<td>"+transactions[x][2] +"</td>";
+                    mhtml += "<td>"+transactions[x][3] +"</td>";
+                    mhtml += "<td style='text-align:right;'>"+new Intl.NumberFormat().format(transactions[x][4]) +"</td>";
+                    mhtml += "<td style='text-align:right;'>"+new Intl.NumberFormat().format(transactions[x][5]) +"</td>";
+                    balance = balance +(parseFloat(transactions[x][4]) - parseFloat(transactions[x][5]));
+
+                    mhtml += "<td style='text-align:right;'><strong>"+new Intl.NumberFormat().format(balance) +"</strong></td>";
+                }
+
+               // console.log(mhtml);
+                $(".voucher-list-table tbody").html(mhtml);
+
+                $('.voucher-list-table').DataTable({
+                    bLengthChange: !1,
+                    language: {
+                        oPaginate: {
+                        sNext: '<i class="mdi mdi-chevron-right"></i>',
+                        sPrevious: '<i class="mdi mdi-chevron-left"></i>',
+                        },
+                    },
+                    order: [[2, "asc"]],
+                    ordering: false,
+                    drawCallback: function (t) {
+                        tooltipElm(), projectListActions();
+                    },
+                    }), 
+                    $("#searchTableList").keyup(function () {
+                        $("#projectList-table").DataTable().search($(this).val()).draw();
+                    })
+                    $(".dataTables_length select").addClass("form-select form-select-sm"),
+                    $(".dataTables_paginate").addClass("pagination-rounded"),
+                    $(".dataTables_filter").hide();
+                }
+
+        });
+    }
+
+    function _toConsumableArray(t) {
+  if (Array.isArray(t)) {
+    for (var e = 0, a = Array(t.length); e < t.length; e++) a[e] = t[e];
+    return a;
+  }
+  return Array.from(t);
+}
+function tooltipElm() {
+  var t = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [].concat(_toConsumableArray(t)).map(function (t) {
+    return new bootstrap.Tooltip(t);
+  });
+}
+function projectListActions() {
+  var a;
+  Array.from(document.querySelectorAll(".edit-list")).forEach(function (e) {
+    e.addEventListener("click", function (t) {
+      (a = e.getAttribute("data-edit-id")),
+        (allProjectList = allProjectList.map(function (t) {
+          return (
+            t.id == a &&
+              sessionStorage.setItem("editInputValue", JSON.stringify(t)),
+            t
+          );
+        }));
+    });
+  }),
+    Array.from(document.querySelectorAll(".remove-list")).forEach(function (e) {
+      e.addEventListener("click", function (t) {
+        (getid = e.getAttribute("data-remove-id")),
+          document
+            .getElementById("remove-item")
+            .addEventListener("click", function () {
+              var e;
+              (e = getid),
+                (allProjectList = allProjectList.filter(function (t) {
+                  return t.id != e;
+                })),
+                $.fn.DataTable.isDataTable("#projectList-table") &&
+                  $("#projectList-table").DataTable().destroy(),
+                loadProjectList(allProjectList),
+                document.getElementById("close-removeProjectModal").click();
+            });
+      });
+    });
+
+  }
+</script>
